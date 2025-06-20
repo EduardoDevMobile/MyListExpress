@@ -35,28 +35,23 @@ class ShoppingListAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val product = items[position]
-
-        // Nombre y categoría
         holder.productName.text = if (product.isBought) "${product.name} (Comprado)" else product.name
         holder.productCategory.text = product.category ?: ""
 
-        // Botones
         holder.markAsBoughtButton.text = if (product.isBought) "Desmarcar" else "Marcar"
         holder.markAsBoughtButton.setOnClickListener { onItemChecked(position) }
         holder.deleteButton.setOnClickListener { onItemDeleted(position) }
 
-        // Imagen con Glide
         if (!product.imageUri.isNullOrEmpty()) {
             Glide.with(holder.itemView.context)
                 .load(Uri.parse(product.imageUri))
-                .placeholder(android.R.drawable.ic_menu_camera) // imagen por defecto
-                .error(android.R.drawable.ic_delete)            // si falla la carga
+                .placeholder(android.R.drawable.ic_menu_camera)
+                .error(android.R.drawable.ic_delete)
                 .into(holder.productImage)
         } else {
             holder.productImage.setImageResource(android.R.drawable.ic_menu_camera)
         }
 
-        // Tachado si está comprado
         holder.productName.paintFlags = if (product.isBought) {
             holder.productName.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
         } else {
