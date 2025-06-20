@@ -10,6 +10,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.mylistexpress.R
 
 class ShoppingListAdapter(
@@ -34,20 +35,32 @@ class ShoppingListAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val product = items[position]
+
+        // Nombre y categoría
         holder.productName.text = if (product.isBought) "${product.name} (Comprado)" else product.name
         holder.productCategory.text = product.category ?: ""
+
+        // Botones
         holder.markAsBoughtButton.text = if (product.isBought) "Desmarcar" else "Marcar"
         holder.markAsBoughtButton.setOnClickListener { onItemChecked(position) }
         holder.deleteButton.setOnClickListener { onItemDeleted(position) }
-        if (product.imageUri != null) {
-            holder.productImage.setImageURI(Uri.parse(product.imageUri))
+
+        // Imagen con Glide
+        if (!product.imageUri.isNullOrEmpty()) {
+            Glide.with(holder.itemView.context)
+                .load(Uri.parse(product.imageUri))
+                .placeholder(android.R.drawable.ic_menu_camera) // imagen por defecto
+                .error(android.R.drawable.ic_delete)            // si falla la carga
+                .into(holder.productImage)
         } else {
             holder.productImage.setImageResource(android.R.drawable.ic_menu_camera)
         }
-        if (product.isBought) {
-            holder.productName.paintFlags = holder.productName.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+
+        // Tachado si está comprado
+        holder.productName.paintFlags = if (product.isBought) {
+            holder.productName.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
         } else {
-            holder.productName.paintFlags = holder.productName.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+            holder.productName.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
         }
     }
 
